@@ -10,7 +10,7 @@ set hh=%time2:~0,2%
 set mn=%time2:~3,2%
 set ss=%time2:~6,2%
  
-set _TEMPDIR=%UserProfile%\desktop\WSUSLogs-%ComputerName%-%yyyy%%mm%%dd%%hh%%mn%%ss%
+set _TEMPDIR=%SystemDrive%\WSUSLogs-%ComputerName%-%yyyy%%mm%%dd%%hh%%mn%%ss%
 
 mkdir %_TEMPDIR%
 
@@ -23,6 +23,7 @@ wevtutil epl Microsoft-Windows-Bits-Client/Operational %_TEMPDIR%\Bits-Client_Op
 msinfo32 /nfo %_TEMPDIR%\msinfo32.nfo
 GPRESULT /H %_TEMPDIR%\GPReport.html
 wmic qfe list /Format:Table > %_TEMPDIR%\QFE.log
+powershell -command "Get-WindowsFeature" > %_TEMPDIR%\WindowsFeature.txt
 
 bitsadmin /list /allusers /verbose > %_TEMPDIR%\bitsadmin.log
 ipconfig /all > %_TEMPDIR%\ipconfig.txt
@@ -90,4 +91,8 @@ copy "%ProgramFiles%\Update Services\WebSevices\DssAuthWebService\Web.config" %_
 copy "%ProgramFiles%\Update Services\WebSevices\ReportingWebService\Web.config" %_TEMPDIR%\IIS\ReportingWebService_Web.config
 copy "%ProgramFiles%\Update Services\WebSevices\ServerSyncWebService\Web.config" %_TEMPDIR%\IIS\ServerSyncWebService_Web.config
 copy "%ProgramFiles%\Update Services\WebSevices\SimpleAuthWebService\Web.config" %_TEMPDIR%\IIS\SimpleAuthWebService_Web.config
+robocopy %SystemRoot%\System32\LogFiles\HTTPERR\ %_TEMPDIR%\IIS\ /MAXAGE:7
+robocopy %SystemDrive%\inetpub\logs\LogFiles %_TEMPDIR%\IIS\ /MAXAGE:3 /s
+
+mkdir %_TEMPDIR%\
 
