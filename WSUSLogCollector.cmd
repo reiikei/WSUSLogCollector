@@ -121,6 +121,7 @@ echo ***************************************************************************
 
 mkdir %_TEMPDIR%\Database
 mkdir %_TEMPDIR%\Database\WID
+copy %SystemRoot%\SYSMSI\SSEE\MSSQL.2005\MSSQL\LOG\*ERRORLOG* %_TEMPDIR%\Database\WID\
 copy %SystemRoot%\WID\Log\*ERROR*.log %_TEMPDIR%\Database\WID\
 robocopy "%ProgramFiles%\Microsoft SQL Server" %_TEMPDIR%\Database\ *ERRORLOG* /s
 
