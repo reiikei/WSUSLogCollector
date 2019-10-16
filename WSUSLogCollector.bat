@@ -94,5 +94,5 @@ copy "%ProgramFiles%\Update Services\WebSevices\SimpleAuthWebService\Web.config"
 robocopy %SystemRoot%\System32\LogFiles\HTTPERR\ %_TEMPDIR%\IIS\ /MAXAGE:7
 robocopy %SystemDrive%\inetpub\logs\LogFiles %_TEMPDIR%\IIS\ /MAXAGE:3 /s
 
-mkdir %_TEMPDIR%\
+mkdir %_TEMPDIR%\Database
 
