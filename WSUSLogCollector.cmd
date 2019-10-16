@@ -12,9 +12,9 @@ set ss=%time2:~6,2%
  
 set _TEMPDIR=%SystemDrive%\WSUSLogs-%ComputerName%-%yyyy%%mm%%dd%%hh%%mn%%ss%
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - イベント ログを取得します。(1/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 mkdir %_TEMPDIR%
 
@@ -24,18 +24,18 @@ wevtutil epl Security %_TEMPDIR%\Security.evtx
 wevtutil epl Setup %_TEMPDIR%\Setup.evtx
 wevtutil epl Microsoft-Windows-Bits-Client/Operational %_TEMPDIR%\Bits-Client_Operational.evtx
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - システム関連情報を取得します。(2/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 msinfo32 /nfo %_TEMPDIR%\msinfo32.nfo
 gpresult /H %_TEMPDIR%\gpresult.html
 wmic qfe list /Format:Table > %_TEMPDIR%\QFE.log
 powershell -command "Get-WindowsFeature" > %_TEMPDIR%\WindowsFeature.txt
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - ネットワークおよび証明書関連情報を取得します。(3/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 bitsadmin /list /allusers /verbose > %_TEMPDIR%\bitsadmin.log
 ipconfig /all > %_TEMPDIR%\ipconfig.txt
@@ -43,12 +43,12 @@ netsh winhttp show proxy > %_TEMPDIR%\winhttp.txt
 copy %windir%\System32\drivers\etc\hosts %_TEMPDIR%\hosts.txt
 certutil -store root > %_TEMPDIR%\certs.txt 2>&1
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - WSUS 関連情報を取得します。(4/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 mkdir %_TEMPDIR%\WSUS
-reg export "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Update Services" %_TEMPDIR%\WSUS\registry_WSUS.txt
+reg export "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Update Services" %_TEMPDIR%\WSUS\WSUS_registry.txt
 copy "%ProgramFiles%\Update Services\LogFiles\*.log" %_TEMPDIR%\WSUS
 copy "%ProgramFiles%\Update Services\LogFiles\*.old" %_TEMPDIR%\WSUS
 
@@ -86,7 +86,7 @@ echo Write-Host "- WSUS.GetDatabaseConfiguration()`r`n" >> %_WSUS_SCRIPT%
 echo Write-Host "=================================`r`n" >> %_WSUS_SCRIPT%
 echo $WSUS.GetDatabaseConfiguration() >> %_WSUS_SCRIPT%
 
-powershell -ExecutionPolicy Bypass -Command %_WSUS_SCRIPT% > %_TEMPDIR%\WSUS\WSUSinfo.log
+powershell -ExecutionPolicy Bypass -Command %_WSUS_SCRIPT% > %_TEMPDIR%\WSUS\WSUS_info.log
 del %_WSUS_SCRIPT%
 
 set _WSUSContent_SCRIPT=%TEMP%\WSUSGetContentInfo.ps1
@@ -94,14 +94,14 @@ set _WSUSContent_SCRIPT=%TEMP%\WSUSGetContentInfo.ps1
 echo # WSUSGetContentInfo.ps1 > %_WSUSContent_SCRIPT%
 echo [void][reflection.assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration") >> %_WSUSContent_SCRIPT%
 echo $WSUS = [Microsoft.UpdateServices.Administration.AdminProxy]::getUpdateServer() >> %_WSUSContent_SCRIPT%
-echo Get-ChildItem ($WSUS.GetConfiguration()).LocalContentCachePath -Recurse >> %_WSUSContent_SCRIPT%
+echo Get-ChildItem ($WSUS.GetConfiguration()).LocalContentCachePath -Recurse ^| Format-List >> %_WSUSContent_SCRIPT%
 
-powershell -ExecutionPolicy Bypass -Command %_WSUSContent_SCRIPT%> %_TEMPDIR%\WSUS\WSUSContentinfo.log
+powershell -ExecutionPolicy Bypass -Command %_WSUSContent_SCRIPT%> %_TEMPDIR%\WSUS\WSUS_Contentinfo.log
 del %_WSUSContent_SCRIPT%
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - IIS 関連情報を取得します。(5/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 mkdir %_TEMPDIR%\IIS
 copy %SystemRoot%\System32\inetsrv\config\applicationHost.config %_TEMPDIR%\IIS\applicationHost.config
@@ -111,21 +111,22 @@ copy "%ProgramFiles%\Update Services\WebServices\DssAuthWebService\Web.config" %
 copy "%ProgramFiles%\Update Services\WebServices\ReportingWebService\Web.config" %_TEMPDIR%\IIS\ReportingWebService_Web.config
 copy "%ProgramFiles%\Update Services\WebServices\ServerSyncWebService\Web.config" %_TEMPDIR%\IIS\ServerSyncWebService_Web.config
 copy "%ProgramFiles%\Update Services\WebServices\SimpleAuthWebService\Web.config" %_TEMPDIR%\IIS\SimpleAuthWebService_Web.config
-robocopy %SystemRoot%\System32\LogFiles\HTTPERR\ %_TEMPDIR%\IIS\ /MAXAGE:7
+mkdir %_TEMPDIR%\IIS\HTTPERR
+robocopy %SystemRoot%\System32\LogFiles\HTTPERR\ %_TEMPDIR%\IIS\HTTPERR /MAXAGE:7
 robocopy %SystemDrive%\inetpub\logs\LogFiles %_TEMPDIR%\IIS\ /MAXAGE:3 /s
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - データベース 関連情報を取得します。(6/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 mkdir %_TEMPDIR%\Database
 mkdir %_TEMPDIR%\Database\WID
 copy %SystemRoot%\WID\Log\*ERROR*.log %_TEMPDIR%\Database\WID\
 robocopy "%ProgramFiles%\Microsoft SQL Server" %_TEMPDIR%\Database\ *ERRORLOG* /s
 
-echo **********************************************************************************
+echo *******************************************************************************
 echo - 取得した情報を圧縮します。(7/7)
-echo **********************************************************************************
+echo *******************************************************************************
 
 call :ZIPLOGS_ALT "%_TEMPDIR%" "%_TEMPDIR%.zip"
 
@@ -134,11 +135,13 @@ if not exist "%_TEMPDIR%.zip" (
     echo フォルダの圧縮に失敗しました。お手数おかけしますが %_TEMPDIR% を圧縮して弊社宛てに送付ください。
     echo.
 ) else (
-    rd /s %_TEMPDIR%
+    rd /s /q %_TEMPDIR%
     echo.
     echo 情報の取得が完了しました。%_TEMPDIR%.zip を弊社宛てに送付ください。
     echo.
 )
+pause
+goto :EOF
 
 :ZIPLOGS_ALT
 setlocal
