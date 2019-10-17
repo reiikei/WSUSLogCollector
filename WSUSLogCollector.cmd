@@ -13,19 +13,19 @@ set ss=%time2:~6,2%
 set _TEMPDIR=%SystemDrive%\WSUSLogs-%ComputerName%-%yyyy%%mm%%dd%%hh%%mn%%ss%
 
 echo *******************************************************************************
-echo - イベント ログを取得します。(1/7)
+echo - �C�x���g ���O���擾���܂��B(1/7)
 echo *******************************************************************************
 
 mkdir %_TEMPDIR%
 
-wevtutil epl System %_TEMPDIR%\System.evtx
-wevtutil epl Application %_TEMPDIR%\Application.evtx
-wevtutil epl Security %_TEMPDIR%\Security.evtx
-wevtutil epl Setup %_TEMPDIR%\Setup.evtx
-wevtutil epl Microsoft-Windows-Bits-Client/Operational %_TEMPDIR%\Bits-Client_Operational.evtx
+wevtutil epl System %_TEMPDIR%\Evt_System.evtx
+wevtutil epl Application %_TEMPDIR%\Evt_Application.evtx
+wevtutil epl Security %_TEMPDIR%\Evt_Security.evtx
+wevtutil epl Setup %_TEMPDIR%\Evt_Setup.evtx
+wevtutil epl Microsoft-Windows-Bits-Client/Operational %_TEMPDIR%\Evt_Bits-Client_Operational.evtx
 
 echo *******************************************************************************
-echo - システム関連情報を取得します。(2/7)
+echo - �V�X�e���֘A�����擾���܂��B(2/7)
 echo *******************************************************************************
 
 msinfo32 /nfo %_TEMPDIR%\msinfo32.nfo
@@ -34,7 +34,7 @@ wmic qfe list /Format:Table > %_TEMPDIR%\QFE.log
 powershell -command "Get-WindowsFeature" > %_TEMPDIR%\WindowsFeature.txt
 
 echo *******************************************************************************
-echo - ネットワークおよび証明書関連情報を取得します。(3/7)
+echo - �l�b�g���[�N����яؖ����֘A�����擾���܂��B(3/7)
 echo *******************************************************************************
 
 bitsadmin /list /allusers /verbose > %_TEMPDIR%\bitsadmin.log
@@ -44,7 +44,7 @@ copy %windir%\System32\drivers\etc\hosts %_TEMPDIR%\hosts.txt
 certutil -store root > %_TEMPDIR%\certs.txt 2>&1
 
 echo *******************************************************************************
-echo - WSUS 関連情報を取得します。(4/7)
+echo - WSUS �֘A�����擾���܂��B(4/7)
 echo *******************************************************************************
 
 mkdir %_TEMPDIR%\WSUS
@@ -100,7 +100,7 @@ powershell -ExecutionPolicy Bypass -Command %_WSUSContent_SCRIPT%> %_TEMPDIR%\WS
 del %_WSUSContent_SCRIPT%
 
 echo *******************************************************************************
-echo - IIS 関連情報を取得します。(5/7)
+echo - IIS �֘A�����擾���܂��B(5/7)
 echo *******************************************************************************
 
 mkdir %_TEMPDIR%\IIS
@@ -116,7 +116,7 @@ robocopy %SystemRoot%\System32\LogFiles\HTTPERR\ %_TEMPDIR%\IIS\HTTPERR /MAXAGE:
 robocopy %SystemDrive%\inetpub\logs\LogFiles %_TEMPDIR%\IIS\ /MAXAGE:3 /s
 
 echo *******************************************************************************
-echo - データベース 関連情報を取得します。(6/7)
+echo - �f�[�^�x�[�X �֘A�����擾���܂��B(6/7)
 echo *******************************************************************************
 
 mkdir %_TEMPDIR%\Database
@@ -126,19 +126,19 @@ copy %SystemRoot%\WID\Log\*ERROR*.log %_TEMPDIR%\Database\WID\
 robocopy "%ProgramFiles%\Microsoft SQL Server" %_TEMPDIR%\Database\ *ERRORLOG* /s
 
 echo *******************************************************************************
-echo - 取得した情報を圧縮します。(7/7)
+echo - �擾�����������k���܂��B(7/7)
 echo *******************************************************************************
 
 call :ZIPLOGS_ALT "%_TEMPDIR%" "%_TEMPDIR%.zip"
 
 if not exist "%_TEMPDIR%.zip" (
     echo.
-    echo フォルダの圧縮に失敗しました。お手数おかけしますが %_TEMPDIR% を圧縮して弊社宛てに送付ください。
+    echo �t�H���_�̈��k�Ɏ��s���܂����B���萔���������܂��� %_TEMPDIR% �����k���ĕ��Ј��Ăɑ��t���������B
     echo.
 ) else (
     rd /s /q %_TEMPDIR%
     echo.
-    echo 情報の取得が完了しました。%_TEMPDIR%.zip を弊社宛てに送付ください。
+    echo ���̎擾���������܂����B%_TEMPDIR%.zip �𕾎Ј��Ăɑ��t���������B
     echo.
 )
 pause
