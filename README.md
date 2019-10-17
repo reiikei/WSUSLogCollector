@@ -20,7 +20,7 @@
     <dt>Q. WSUSLogCollector による情報の採取は、どのくらいの時間がかかりますか？</dt>
     <dd>環境によって異なるため、一概に申し上げることは出来ませんが、通常数分程度で完了します。</dd>
     <dt>Q. WSUSLogCollector によって、どのような情報が採取されますか？</dt>
-    <dd>[WSUSLogCollector にて取得される情報の一覧](https://github.com/reiikei/WSUSLogCollector#wsuslogcollector-にて取得出来る情報の一覧)として後述しますので、こちらをご参考としてください。</dd>
+    <dd>「WSUSLogCollector にて取得される情報の一覧」として後述しますので、こちらをご参考としてください。</dd>
 </dl> 
 
 # WSUSLogCollector にて取得出来る情報の一覧
