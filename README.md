@@ -7,7 +7,7 @@
 * Powershell が利用可能な環境 (Windows Server 2008 R2 以降の環境であれば既定で利用可能)
 
 ## WSUSLogCollector の実行方法
-1. [ZIP ファイル](https://github.com/reiikei/WSUSLogCollector/archive/1.0.0.zip) をダウンロードし、WSUSLogCollector.cmd を情報採取対象の WSUS サーバーへコピーします。
+1. [ZIP ファイル](https://github.com/reiikei/WSUSLogCollector/archive/1.0.0.zip) をダウンロード、展開し、WSUSLogCollector.cmd を情報採取対象の WSUS サーバーへコピーします。
 2. 情報採取対象の WSUS サーバー上にて管理者権限を持つユーザーにて、WSUSLogCollector.cmd を右クリックし "管理者として実行" を選択して、情報の取得を開始します。
 3. システム ドライブ (C ドライブ) 直下にファイル `WSUSLogs-<ホスト名>-<yyyymmddhhmnss>.zip` が出力されるため、本ファイルをお問い合わせの中でご案内するアップロード サイトより、アップロードしてください。
 
